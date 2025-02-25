@@ -1,84 +1,49 @@
-import React, { useContext, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
 import { RecipeContext } from "../context/RecipeContext";
+import { useParams, useNavigate } from "react-router-dom";
 
 function EditRecipe() {
-  const { recipes, setRecipes } = useContext(RecipeContext);
   const { id } = useParams();
   const navigate = useNavigate();
+  const { recipes, editRecipe } = useContext(RecipeContext);
 
-  const recipe = recipes[id];
+  const existingRecipe = recipes.find((r) => r.id === Number(id));
 
-  const [title, setTitle] = useState(recipe.title);
-  const [ingredients, setIngredients] = useState(recipe.ingredients);
-  const [instructions, setInstructions] = useState(recipe.instructions);
+  const [recipe, setRecipe] = useState(existingRecipe || {
+    title: "",
+    ingredients: "",
+    instructions: "",
+    image: ""
+  });
+
+  useEffect(() => {
+    if (!existingRecipe) {
+      navigate("/"); // Redirect if recipe not found
+    }
+  }, [existingRecipe, navigate]);
+
+  const handleChange = (e) => {
+    setRecipe({ ...recipe, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const updatedRecipes = [...recipes];
-    updatedRecipes[id] = { title, ingredients, instructions };
-    setRecipes(updatedRecipes);
-    localStorage.setItem("recipes", JSON.stringify(updatedRecipes));
+    editRecipe(recipe);
     navigate("/");
   };
 
   return (
-    <div style={styles.container}>
+    <div>
       <h2>Edit Recipe</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Ingredients"
-          value={ingredients}
-          onChange={(e) => setIngredients(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Instructions"
-          value={instructions}
-          onChange={(e) => setInstructions(e.target.value)}
-          required
-        />
-        <button type="submit" style={styles.button}>Save Changes</button>
+      <form onSubmit={handleSubmit}>
+        <input type="text" name="title" value={recipe.title} onChange={handleChange} required />
+        <textarea name="ingredients" value={recipe.ingredients} onChange={handleChange} required />
+        <textarea name="instructions" value={recipe.instructions} onChange={handleChange} required />
+        <input type="text" name="image" value={recipe.image} onChange={handleChange} />
+        <button type="submit">Update Recipe</button>
       </form>
-      <button onClick={() => navigate("/")} style={styles.cancelButton}>Cancel</button>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: "20px",
-    textAlign: "center",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-    maxWidth: "400px",
-    margin: "auto",
-  },
-  button: {
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    padding: "10px",
-    cursor: "pointer",
-  },
-  cancelButton: {
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    padding: "10px",
-    cursor: "pointer",
-    marginTop: "10px",
-  },
-};
 
 export default EditRecipe;

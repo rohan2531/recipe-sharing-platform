@@ -14,6 +14,7 @@ function Home() {
         ) : (
           recipes.map((recipe, index) => <RecipeCard key={index} index={index} recipe={recipe} />)
         )}
+        
       </div>
     </div>
   );

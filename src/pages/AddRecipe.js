@@ -1,9 +1,17 @@
 import React, { useState, useContext } from "react";
 import { RecipeContext } from "../context/RecipeContext";
+import { useNavigate } from "react-router-dom";
 
 function AddRecipe() {
   const { addRecipe } = useContext(RecipeContext);
-  const [recipe, setRecipe] = useState({ title: "", ingredients: "", instructions: "" });
+  const navigate = useNavigate();
+
+  const [recipe, setRecipe] = useState({
+    title: "",
+    ingredients: "",
+    instructions: "",
+    image: "" // Image URL field
+  });
 
   const handleChange = (e) => {
     setRecipe({ ...recipe, [e.target.name]: e.target.value });
@@ -11,74 +19,47 @@ function AddRecipe() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!recipe.title || !recipe.ingredients || !recipe.instructions) {
-      alert("Please fill in all fields!");
-      return;
-    }
     addRecipe(recipe);
-    setRecipe({ title: "", ingredients: "", instructions: "" });
+    navigate("/");
   };
 
   return (
-    <div style={styles.container}>
+    <div>
       <h2>Add New Recipe</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           name="title"
           placeholder="Recipe Title"
           value={recipe.title}
           onChange={handleChange}
-          style={styles.input}
+          required
         />
         <textarea
           name="ingredients"
-          placeholder="Ingredients (comma separated)"
+          placeholder="Ingredients"
           value={recipe.ingredients}
           onChange={handleChange}
-          style={styles.textarea}
+          required
         />
         <textarea
           name="instructions"
           placeholder="Instructions"
           value={recipe.instructions}
           onChange={handleChange}
-          style={styles.textarea}
+          required
         />
-        <button type="submit" style={styles.button}>Add Recipe</button>
+        <input
+          type="text"
+          name="image"
+          placeholder="Image URL"
+          value={recipe.image}
+          onChange={handleChange}
+        />
+        <button type="submit">Add Recipe</button>
       </form>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: "20px",
-    textAlign: "center",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-    maxWidth: "400px",
-    margin: "auto",
-  },
-  input: {
-    padding: "10px",
-    fontSize: "16px",
-  },
-  textarea: {
-    padding: "10px",
-    fontSize: "16px",
-    height: "100px",
-  },
-  button: {
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    padding: "10px",
-    cursor: "pointer",
-  },
-};
 
 export default AddRecipe;

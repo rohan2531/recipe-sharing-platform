@@ -1,41 +1,50 @@
 import React, { createContext, useState, useEffect } from "react";
 
-// Create Recipe Context
 export const RecipeContext = createContext();
 
 export const RecipeProvider = ({ children }) => {
-  // Load recipes from local storage (if available)
+  //localStorage.removeItem("recipes");
+
+  // Load recipes from localStorage
   const [recipes, setRecipes] = useState(() => {
-    const storedRecipes = localStorage.getItem("recipes");
-    return storedRecipes ? JSON.parse(storedRecipes) : [];
+    const savedRecipes = localStorage.getItem("recipes");
+    return savedRecipes ? JSON.parse(savedRecipes) : [];
   });
 
-  // Save recipes to local storage whenever they change
+  // Save recipes to localStorage whenever they change
   useEffect(() => {
+    console.log("Saving to localStorage:", recipes); // Debugging step
     localStorage.setItem("recipes", JSON.stringify(recipes));
   }, [recipes]);
 
-  // Add a new recipe
+  // Add Recipe
   const addRecipe = (recipe) => {
-    const updatedRecipes = [...recipes, recipe];
+    const newRecipe = { ...recipe, id: Date.now() }; // Assign a unique ID
+    setRecipes([...recipes, newRecipe]);
+  };
+
+  // Edit Recipe
+  const editRecipe = (updatedRecipe) => {
+    const updatedRecipes = recipes.map((recipe) =>
+      recipe.id === updatedRecipe.id ? updatedRecipe : recipe
+    );
     setRecipes(updatedRecipes);
   };
 
-  // Edit an existing recipe
-  const updateRecipe = (index, updatedRecipe) => {
-    const updatedRecipes = [...recipes];
-    updatedRecipes[index] = updatedRecipe;
-    setRecipes(updatedRecipes);
+  // Delete Recipe
+  const deleteRecipe = (id) => {
+    const filteredRecipes = recipes.filter((recipe) => recipe.id !== id);
+    setRecipes(filteredRecipes);
   };
 
-  // Delete a recipe
-  const deleteRecipe = (index) => {
-    const updatedRecipes = recipes.filter((_, i) => i !== index);
-    setRecipes(updatedRecipes);
+  const clearRecipes = () => {
+    localStorage.removeItem("recipes");
+    setRecipes([]); // Clear state as well
   };
+  
 
   return (
-    <RecipeContext.Provider value={{ recipes, addRecipe, updateRecipe, deleteRecipe, setRecipes }}>
+    <RecipeContext.Provider value={{ recipes, addRecipe, editRecipe, deleteRecipe }}>
       {children}
     </RecipeContext.Provider>
   );

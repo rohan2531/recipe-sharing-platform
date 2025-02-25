@@ -1,33 +1,33 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-function RecipeCard({ recipe, index }) {
+function RecipeCard({ recipe }) {
+  const navigate = useNavigate();
+
   return (
     <div style={styles.card}>
+      {recipe.image && <img src={recipe.image} alt={recipe.title} style={styles.image} />}
       <h3>{recipe.title}</h3>
-      <p><strong>Ingredients:</strong> {recipe.ingredients.substring(0, 30)}...</p>
-      <Link to={`/recipe/${index}`} style={styles.button}>View Details</Link>
+      <button onClick={() => navigate(`/recipe/${recipe.id}`)}>View Details</button> {/* Use recipe.id */}
+
     </div>
+    
   );
 }
 
 const styles = {
   card: {
-    border: "1px solid #ccc",
-    padding: "10px",
+    border: "1px solid #ddd",
+    padding: "15px",
     margin: "10px",
-    borderRadius: "5px",
     textAlign: "center",
   },
-  button: {
-    display: "inline-block",
-    marginTop: "10px",
-    padding: "5px 10px",
-    backgroundColor: "#28a745",
-    color: "white",
-    textDecoration: "none",
-    borderRadius: "5px",
-  },
+  image: {
+    width: "100%",
+    height: "200px",
+    objectFit: "cover",
+    borderRadius: "8px",
+  }
 };
 
 export default RecipeCard;
